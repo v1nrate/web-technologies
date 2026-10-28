@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title', 'Пользователи — админ-панель')
+@section('content')
+<div class="page-heading"><span class="eyebrow">ДОСТУП</span><h1>Пользователи</h1><p>Просмотр аккаунтов и управление ролями.</p></div>@include('admin._nav')
+<form method="get" class="admin-filters panel"><input name="search" value="{{ request('search') }}" placeholder="Имя или email"><button class="btn">Найти</button></form>
+<div class="panel admin-table-wrap"><table class="admin-table"><thead><tr><th>Имя</th><th>Email</th><th>Сборки</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead><tbody>@foreach($users as $user)<tr><td>{{ $user->name }} @if($user->id===auth()->id())<small>Вы</small>@endif</td><td>{{ $user->email }}</td><td>{{ $user->builds_count }}</td><td>{{ $user->is_admin ? 'Администратор' : 'Пользователь' }}</td><td>{{ $user->created_at->format('d.m.Y') }}</td><td>@if($user->id !== auth()->id())<form method="post" action="{{ route('admin.users.role',$user) }}" onsubmit="return confirm('Изменить права доступа?')">@csrf @method('PATCH')<input type="hidden" name="is_admin" value="{{ $user->is_admin ? 0 : 1 }}"><button class="btn ghost">{{ $user->is_admin ? 'Снять права' : 'Назначить админом' }}</button></form>@else<span class="muted">Текущий аккаунт</span>@endif</td></tr>@endforeach</tbody></table></div><div class="pagination">{{ $users->links() }}</div>
+@endsection
